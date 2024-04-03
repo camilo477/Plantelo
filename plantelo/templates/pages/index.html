@@ -1,0 +1,190 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Plantelo</title>
+    <script src="{% static 'js/mapdata.js' %}"></script>
+    <script src="{% static 'js/countrymap.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #map {
+            position: relative;
+            width: 80%;
+            height: 80vh;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .ventana {
+            position: absolute;
+            left: -700px; /* Inicialmente oculto */
+            top: 0;
+            width: 570px;
+            height: 125%;
+            background-color: #BEFFA0;
+            padding: 30px;
+            box-sizing: border-box;
+            transition: left 0.3s; 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        .ventana-abierto {
+            left: 0; 
+        }
+
+        .titulo {
+            color: #4caf50;
+            font-size: 24px;
+            font-weight: bold;
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 10px 0;
+        }
+
+        .busqueda {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .busqueda input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .busqueda button {
+            padding: 10px;
+            border-radius: 4px;
+            border: none;
+            background-color: #4caf50;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .tarjeta {
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .tarjeta img {
+            width: 100%;
+            height: auto;
+        }
+
+        .tarjeta-contenido {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .tarjeta-contenido h3 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+
+        .tarjeta-contenido p {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* Estilos para el botón */
+        .boton-plegar-desplegar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <button class="boton-plegar-desplegar" onclick="toggleVentana()">Plegar/Desplegar</button>
+    <div class="ventana" id="miVentana">
+        <h1 class="titulo">Plantelo</h1>
+        <div class="busqueda">
+            <input type="text" placeholder="Buscar..." id="search-input">
+            <!-- Botón para activar la búsqueda -->
+            <button onclick="buscarPlanta()">Buscar</button>
+        </div>
+        <!-- Aquí se mostrará la información de la planta correspondiente al ID ingresado -->
+        <div id="plant-info"></div>
+    </div>
+
+    <script>
+        function toggleVentana() {
+            var ventana = document.getElementById("miVentana");
+            ventana.classList.toggle("ventana-abierto");
+        }
+    
+        function buscarPlanta() {
+            var id = document.getElementById("search-input").value;
+            var plantInfoDiv = document.getElementById("plant-info");
+
+            // Make the AJAX request
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/mostrar_plantas/?id=' + id, true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.error) {
+                            plantInfoDiv.innerText = 'Error: ' + response.error;
+                        } else {
+                            // Crear una tarjeta para mostrar la información de la planta
+                            var planta = response.planta;
+                            var cardHTML = '<div class="tarjeta">';
+                            cardHTML += '<div class="tarjeta-contenido">';
+                            cardHTML += '<h3>' + planta.Nombre_cientifico + '</h3>';
+                            cardHTML += '<p><strong>Id:</strong> ' + planta.Id + '</p>';
+                            cardHTML += '<p><strong>Código institución:</strong> ' + planta.Codigo_institucion + '</p>';
+                            cardHTML += '<p><strong>Código colección:</strong> ' + planta.Codigo_coleccion + '</p>';
+                            cardHTML += '<p><strong>Grabado por:</strong> ' + planta.Grabado_por + '</p>';
+                            cardHTML += '<p><strong>País:</strong> ' + planta.Pais + '</p>';
+                            cardHTML += '<p><strong>Provincia/Estado:</strong> ' + planta.Provincia_estado + '</p>';
+                            cardHTML += '<p><strong>Ciudad:</strong> ' + planta.Ciudad + '</p>';
+                            cardHTML += '<p><strong>Localidad:</strong> ' + planta.Localidad + '</p>';
+                            cardHTML += '<p><strong>Latitud:</strong> ' + planta.Latitud + '</p>';
+                            cardHTML += '<p><strong>Longitud:</strong> ' + planta.Longitud + '</p>';
+                            cardHTML += '<p><strong>Identificado por:</strong> ' + planta.Identificado_por + '</p>';
+                            cardHTML += '<p><strong>Nombre científico:</strong> ' + planta.Nombre_cientifico + '</p>';
+                            cardHTML += '<p><strong>Reino:</strong> ' + planta.Reino + '</p>';
+                            cardHTML += '<p><strong>Filo:</strong> ' + planta.Filo + '</p>';
+                            cardHTML += '<p><strong>Clase:</strong> ' + planta.Clase + '</p>';
+                            cardHTML += '<p><strong>Orden:</strong> ' + planta.Orden + '</p>';
+                            cardHTML += '<p><strong>Familia:</strong> ' + planta.Familia + '</p>';
+                            cardHTML += '<p><strong>Género:</strong> ' + planta.Genero + '</p>';
+                            cardHTML += '<p><strong>Epíteto específico:</strong> ' + planta.Epiteto_especifico + '</p>';
+                            cardHTML += '<p><strong>Taxón rango:</strong> ' + planta.Taxon_rango + '</p>';
+                            cardHTML += '<p><strong>Ubicación:</strong> ' + planta.Ubicacion + '</p>';
+                            cardHTML += '</div></div>';
+
+                            // Agregar la tarjeta al contenedor de información de la planta
+                            plantInfoDiv.innerHTML = cardHTML;
+                        }
+                    } catch (error) {
+                        plantInfoDiv.innerText = 'Error: Respuesta no válida del servidor';
+                    }
+                } else {
+                    plantInfoDiv.innerText = 'Error: ' + xhr.statusText;
+                }
+            };
+            xhr.onerror = function() {
+                plantInfoDiv.innerText = 'Error de conexión';
+            };
+            xhr.send();
+        }
+    </script>
+</body>
+</html>
