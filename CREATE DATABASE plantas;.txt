@@ -1,0 +1,32 @@
+CREATE DATABASE plantas;
+USE plantas;
+
+CREATE TABLE planta (
+    Id INT,
+    Codigo_institucion VARCHAR(255),
+    Codigo_coleccion VARCHAR(255),
+    Grabado_por VARCHAR(255),
+    Pais VARCHAR(255),
+    Provincia_estado VARCHAR(255),
+    Ciudad VARCHAR(255),
+    Localidad VARCHAR(255),
+    Latitud DECIMAL(10, 8),
+    Longitud DECIMAL(11, 8),
+    Identificado_por VARCHAR(255),
+    Nombre_cientifico VARCHAR(255),
+    Reino VARCHAR(255),
+    Filo VARCHAR(255),
+    Clase VARCHAR(255),
+    Orden VARCHAR(255),
+    Familia VARCHAR(255),
+    Genero VARCHAR(255),
+    Epiteto_especifico VARCHAR(255),
+    Taxon_rango VARCHAR(255),
+    Ubicacion VARCHAR(255)
+);
+
+LOAD DATA INFILE 'A:/programacion/django/plantelo/plantelo/base_de_datos/base_plantas_csv.csv'
+INTO TABLE planta
+FIELDS TERMINATED BY ';' ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
