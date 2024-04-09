@@ -68,114 +68,35 @@ var simplemaps_countrymap_mapdata={
     state_image_url: "",
     state_image_position: "",
     location_image_url: "",
-
-
   },
+  
   state_specific: {
     COL1283: {
       name: "Amazonas",
     },
-    COL1314: {
-      name: "Antioquia"
-    },
-    COL1315: {
-      name: "Boyacá"
-    },
-    COL1316: {
-      name: "Córdoba"
-    },
-    COL1317: {
-      name: "Santander"
-    },
-    COL1318: {
-      name: "La Guajira"
-    },
-    COL1342: {
-      name: "San Andrés y Providencia"
-    },
-    COL1397: {
-      name: "Caldas"
-    },
-    COL1398: {
-      name: "Cundinamarca"
-    },
-    COL1399: {
-      name: "Bogota"
-    },
-    COL1400: {
-      name: "Quindío"
-    },
-    COL1401: {
-      name: "Risaralda"
-    },
-    COL1402: {
-      name: "Tolima"
-    },
-    COL1403: {
-      name: "Caquetá"
-    },
-    COL1404: {
-      name: "Cauca"
-    },
-    COL1405: {
-      name: "Huila"
-    },
-    COL1406: {
-      name: "Nariño"
-    },
-    COL1407: {
-      name: "Putumayo"
-    },
-    COL1408: {
-      name: "Valle del Cauca"
-    },
-    COL1412: {
-      name: "Atlántico"
-    },
-    COL1413: {
-      name: "Bolívar"
-    },
-    COL1414: {
-      name: "Cesar"
-    },
-    COL1415: {
-      name: "Chocó"
-    },
-    COL1416: {
-      name: "Magdalena"
-    },
-    COL1417: {
-      name: "Sucre"
-    },
-    COL1420: {
-      name: "Arauca"
-    },
-    COL1421: {
-      name: "Norte de Santander"
-    },
-    COL1422: {
-      name: "Casanare"
-    },
-    COL1423: {
-      name: "Guaviare"
-    },
-    COL1424: {
-      name: "Guainía"
-    },
-    COL1425: {
-      name: "Meta"
-    },
-    COL1426: {
-      name: "Vaupés"
-    },
-    COL1427: {
-      name: "Vichada"
-    }
+    // otros estados...
   },
   locations: {},
   labels: {},
   legend: {
     entries: []
   },
-  regions: {}
+  regions: {},
 };
+
+// Agregar evento de clic a las regiones para imprimir el nombre en consola
+document.addEventListener('DOMContentLoaded', function() {
+    // Obtener todas las regiones del mapa
+    var regions = document.querySelectorAll('svg g > path');
+
+    // Agregar un evento de clic a cada región
+    regions.forEach(function(region) {
+        region.addEventListener('click', function() {
+            // Obtener el nombre de la región
+            var regionName = region.getAttribute('data-name');
+            
+            // Imprimir el nombre de la región en la consola
+            console.log('Region clicked:', regionName);
+        });
+    });
+});
