@@ -15,6 +15,33 @@ import mysql.connector
 from django.http import JsonResponse
 from .models import Planta
 
+def buscar_plantas(request):
+    nombre_cientifico = request.GET.get('nombre_cientifico', '').lower() 
+
+    try:
+        connection = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="",
+            database="plantas"
+        )
+        cursor = connection.cursor()
+
+        query = "SELECT Nombre_cientifico FROM planta WHERE Nombre_cientifico LIKE %s;"
+        cursor.execute(query, (nombre_cientifico + '%',))
+
+        plantas = cursor.fetchall()
+
+        cursor.close()
+        connection.close()
+
+        nombres_plantas = [planta[0] for planta in plantas]
+
+        return JsonResponse({'plant_names': nombres_plantas})
+    except mysql.connector.Error as e:
+        return JsonResponse({'error': str(e)})
+
+
 def mostrar_nombres_plantas(request):
     try:
         connection = mysql.connector.connect(
@@ -41,7 +68,7 @@ def mostrar_nombres_plantas(request):
         return JsonResponse({'error': str(e)})
 
 def mostrar_plantas(request):
-    nombre_cientifico = request.GET.get('nombre_cientifico', '').lower()  # Convertir a minúsculas
+    nombre_cientifico = request.GET.get('nombre_cientifico', '').lower() 
 
     try:
         connection = mysql.connector.connect(
@@ -58,7 +85,6 @@ def mostrar_plantas(request):
 
         planta = cursor.fetchone()
 
-        # Verificar si la planta es None
         if not planta:
             return JsonResponse({'error': 'Planta con nombre científico "{}" no encontrada'.format(nombre_cientifico)})
 
@@ -91,7 +117,7 @@ def mostrar_plantas(request):
         return JsonResponse({'error': str(e)})
     finally:
         if cursor:
-            cursor.fetchall()  # Leer todos los resultados de la consulta
+            cursor.fetchall()  
             cursor.close()
         if connection:
             connection.close()
