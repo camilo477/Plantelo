@@ -22,7 +22,7 @@
 
         .ventana {
             position: absolute;
-            left: -700px; /* Inicialmente oculto */
+            left: -700px; 
             top: 0;
             width: 570px;
             height: 125%;
@@ -104,7 +104,7 @@
             margin: 0;
         }
 
-        /* Estilos para el botón */
+       
         .boton-plegar-desplegar {
             position: absolute;
             top: 20px;
@@ -139,12 +139,9 @@
     <h1 class="titulo">Plantelo</h1>
     <div class="busqueda">
         <input type="text" placeholder="Buscar..." id="search-input">
-        <!-- Botón para activar la búsqueda -->
         <button onclick="buscarPlanta()">Buscar</button>
     </div>
-    <!-- Aquí se mostrará la información de la planta correspondiente al ID ingresado -->
     <div id="plant-info"></div>
-    <!-- Div para mostrar mensaje cuando no hay plantas -->
     <div id="no-plant-message" style="display: none;">No se encontraron plantas</div>
     <div class="container mt-3">
         <h2>Lista de Nombres de Plantas</h2>
@@ -169,13 +166,9 @@
         function buscarPlanta(nombre_cientifico) {
     var plantInfoDiv = document.getElementById("plant-info");
             
-    // Verificar si se proporcionó un nombre científico
     if (nombre_cientifico === undefined) {
-        // Si no se proporciona un nombre científico, obtenerlo del campo de búsqueda
         nombre_cientifico = document.getElementById("search-input").value;
     }
-
-    // Make the AJAX request to fetch plant information based on scientific name
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '/mostrar_plantas/?nombre_cientifico=' + encodeURIComponent(nombre_cientifico), true);
     xhr.onload = function() {
@@ -185,7 +178,6 @@
                 if (response.error) {
                     plantInfoDiv.innerText = 'Error: ' + response.error;
                 } else {
-                    // Create a card to display plant information
                     var planta = response.planta;
                     var cardHTML = '<div class="tarjeta">';
                     cardHTML += '<div class="tarjeta-contenido">';
@@ -213,7 +205,6 @@
                     cardHTML += '<p><strong>Ubicación:</strong> ' + planta.Ubicacion + '</p>';
                     cardHTML += '</div></div>';
 
-                    // Add the card to the plant information container
                     plantInfoDiv.innerHTML = cardHTML;
                 }
             } catch (error) {
@@ -229,11 +220,9 @@
     xhr.send();
 }
 
-// Modificar la función mostrarNombresPlantas para llamar a buscarPlanta con el nombre científico como argumento
 function mostrarNombresPlantas() {
     var plantNamesDiv = document.getElementById("plant-names");
 
-    // Make the AJAX request to fetch plant names
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '/mostrar_nombres_plantas/', true);
     xhr.onload = function() {
@@ -243,14 +232,12 @@ function mostrarNombresPlantas() {
                 if (response.error) {
                     plantNamesDiv.innerHTML = '<button type="button" class="list-group-item list-group-item-action active">' + response.error + '</button>';
                 } else {
-                    // Display the list of plant names
                     var plantNames = response.plant_names;
                     var namesHTML = '';
                     plantNames.forEach(function(name) {
                         namesHTML += '<button type="button" class="list-group-item list-group-item-action btn btn-outline-primary" onclick="buscarPlanta(\'' + name + '\')">' + name + '</button><br>';
                     });
 
-                    // Add the buttons to the container
                     plantNamesDiv.innerHTML = namesHTML;
                 }
             } catch (error) {
@@ -269,10 +256,8 @@ function mostrarNombresPlantas() {
 function autocompletarPlantas(input) {
     var plantNamesDiv = document.getElementById("plant-names");
 
-    // Obtener el texto actual del campo de búsqueda
     var searchTerm = input.value.toLowerCase();
 
-    // Make the AJAX request to fetch plant names based on search term
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '/buscar_plantas/?nombre_cientifico=' + encodeURIComponent(searchTerm), true);
     xhr.onload = function() {
@@ -282,14 +267,12 @@ function autocompletarPlantas(input) {
                 if (response.error) {
                     plantNamesDiv.innerHTML = '<button type="button" class="list-group-item list-group-item-action active">' + response.error + '</button>';
                 } else {
-                    // Display the list of plant names
                     var plantNames = response.plant_names;
                     var namesHTML = '';
                     plantNames.forEach(function(name) {
                         namesHTML += '<button type="button" class="list-group-item list-group-item-action btn btn-outline-primary" onclick="buscarPlanta(\'' + name + '\')">' + name + '</button><br>';
                     });
 
-                    // Add the buttons to the container
                     plantNamesDiv.innerHTML = namesHTML;
                 }
             } catch (error) {
@@ -305,7 +288,6 @@ function autocompletarPlantas(input) {
     xhr.send();
 }
 
-// Escuchar el evento de cambio en el campo de búsqueda
 document.getElementById('search-input').addEventListener('input', function() {
     autocompletarPlantas(this);
 });
@@ -314,6 +296,9 @@ document.getElementById('search-input').addEventListener('input', function() {
 window.onload = function() {
     mostrarNombresPlantas();
 };
+
+
     </script>
+
 </body>
 </html>
