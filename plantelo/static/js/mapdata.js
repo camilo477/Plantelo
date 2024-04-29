@@ -1,4 +1,4 @@
-var simplemaps_countrymap_mapdata={
+var simplemaps_countrymap_mapdata = {
   main_settings: {
    //General settings
     width: "700", //'700' or 'responsive'
@@ -70,12 +70,7 @@ var simplemaps_countrymap_mapdata={
     location_image_url: "",
   },
   
-  state_specific: {
-    COL1283: {
-      name: "Amazonas",
-    },
-    
-  },
+  
   locations: {},
   labels: {},
   legend: {
@@ -83,42 +78,19 @@ var simplemaps_countrymap_mapdata={
   },
   regions: {}
 };
-var stateNamesById = {
-  COL1316: "Córdoba",
-  COL1317: "Santander",
-  COL1314: "Antioquia",
-  COL1315: "Boyacá",
-  COL1318: "La Guajira",
-  COL1422: "Casanare",
-  COL1420: "Arauca",
-  COL1421: "Norte de Santander",
-  COL1408: "Valle del Cauca",
-  COL1423: "Guaviare",
-  COL1424: "Guainía",
-  COL1425: "Meta",
-  COL1426: "Vaupés",
-  COL1427: "Vichada",
-  COL1402: "Tolima",
-  COL1403: "Caquetá",
-  COL1400: "Quindío",
-  COL1401: "Risaralda",
-  COL1406: "Nariño",
-  COL1407: "Putumayo",
-  COL1404: "Cauca",
-  COL1405: "Huila",
-  COL1342: "San Andrés y Providencia",
-  COL1283: "Amazonas",
-  COL1398: "Cundinamarca",
-  COL1399: "Bogotá",
-  COL1415: "Chocó",
-  COL1414: "Cesar",
-  COL1417: "Sucre",
-  COL1416: "Magdalena",
-  COL1397: "Caldas",
-  COL1413: "Bolívar",
-  COL1412: "Atlántico"
-};
 document.addEventListener('DOMContentLoaded', function() {
+  // Agrega un listener para capturar el evento de clic en una zona del mapa
+  simplemaps_countrymap.mapdata.objects.states.geometries.forEach(function(state) {
+      var stateId = state.id;
+      var stateElement = document.getElementById(stateId);
+      if (stateElement) {
+          stateElement.addEventListener('click', function() {
+              // Llama a la función zoomEstado cuando se hace clic en una zona del mapa
+              zoomEstado(stateId);
+          });
+      }
+  });
+
   // Define la configuración del mapa
   var simplemaps_countrymap_mapdata = {
       // Aquí va tu configuración del mapa
@@ -159,3 +131,20 @@ document.addEventListener('DOMContentLoaded', function() {
       // Puedes agregar aquí cualquier acción que desees realizar después de que se complete el zoom en el mapa
   };
 });
+
+function zoomEstado(state_id) {
+  if (typeof simplemaps_countrymap !== "undefined" && simplemaps_countrymap.state_zoom) {
+      // Verificar si ya estás en zoom
+      if (simplemaps_countrymap.zoom_level === 'state') {
+          // Si ya estás en zoom, solicitar confirmación antes de cambiar de zona
+          if (confirm("¿Deseas cambiar a " + stateNamesById[state_id] + "?")) {
+              simplemaps_countrymap.state_zoom(state_id);
+          }
+      } else {
+          // Si no estás en zoom, cambiar de zona directamente
+          simplemaps_countrymap.state_zoom(state_id);
+      }
+  } else {
+      console.error('El objeto simplemaps_countrymap o su método state_zoom no están definidos');
+  }
+}
