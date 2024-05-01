@@ -129,7 +129,7 @@ def mapa(request):
     return render(request, 'pages/index.html')
 
 def mostrar_plantas_por_estado(request):
-    nombre_estado = request.GET.get('nombre_estado', '').lower()
+    nombre_estado = request.GET.get('nombre_estado', '')
 
     try:
         connection = mysql.connector.connect(
@@ -141,11 +141,10 @@ def mostrar_plantas_por_estado(request):
 
         cursor = connection.cursor()
 
-        if nombre_estado:  # Si se especifica un estado, filtrar por ese estado
+        if nombre_estado: 
             query = "SELECT * FROM planta WHERE Provincia_estado = %s;"
+            
             cursor.execute(query, (nombre_estado,))
-        else:  # Si no se especifica un estado, devolver un error
-            return JsonResponse({'error': 'Debe especificar un estado'})
 
         plantas = cursor.fetchall()
 

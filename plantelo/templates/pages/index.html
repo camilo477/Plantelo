@@ -186,7 +186,8 @@
             <input type="text" placeholder="Buscar..." id="search-input">
             <button onclick="buscarPlanta()">Buscar</button>
             <div id="estado-seleccionado"></div>
-            <button class="btn btn-secondary" onclick="seleccionarTodosDepartamentos()">Mostrar todas las plantas</button>
+            <button class="btn btn-secondary" onclick="seleccionarTodosDepartamentos()">Mostrar todas las
+                plantas</button>
 
         </div>
         <div id="plant-info"></div>
@@ -256,10 +257,9 @@
     </div>
     <script>
 
-function seleccionarTodosDepartamentos() {
-    // Establecer el departamento seleccionado como vacío
-    mostrarNombresPlantas()
-}
+        function seleccionarTodosDepartamentos() {
+            mostrarNombresPlantas()
+        }
         document.addEventListener('mapZoomed', function (event) {
             var departamento = event.detail;
             mostrarPlantasPorEstado(departamento);
@@ -282,11 +282,14 @@ function seleccionarTodosDepartamentos() {
 
         function mostrarNombresPlantas() {
             var plantNamesDiv = document.getElementById("plant-names");
-            var selectedState = document.getElementById("estado-seleccionado").innerText;
-
-            // Verificar si se ha seleccionado un estado
+            var selectedStateElement = document.getElementById("estado-seleccionado");
+            if (!selectedStateElement || !selectedStateElement.innerText || selectedStateElement.innerText.trim() === "") {
+                // Aquí puedes manejar el caso en el que no se haya seleccionado ningún estado
+                console.log('Debe seleccionar un estado antes de mostrar las plantas');
+                return;
+            }
+            var selectedState = selectedStateElement.innerText.trim();
             if (!selectedState || selectedState.trim() === "") {
-                // Si no se ha seleccionado ningún estado, mostrar todas las plantas
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', '/mostrar_nombres_plantas/', true);
                 xhr.onload = function () {
@@ -315,37 +318,7 @@ function seleccionarTodosDepartamentos() {
                     plantNamesDiv.innerHTML = '<button type="button" class="list-group-item list-group-item-action active btn btn-outline-danger">Connection error</button>';
                 };
                 xhr.send();
-            } else {
-                // Si se ha seleccionado un estado, mostrar las plantas solo para ese estado
-                function mostrarPlantasPorEstado(selectedState) {
-                    var plantNamesDiv = document.getElementById("plant-names");
-
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('GET', '/mostrar_plantas_por_estado/?nombre_estado=' + encodeURIComponent(selectedState), true);
-                    xhr.onload = function () {
-                        if (xhr.status == 200) {
-                            var response = JSON.parse(xhr.responseText);
-                            if (response.error) {
-                                plantNamesDiv.innerHTML = '<button type="button" class="list-group-item list-group-item-action active">' + response.error + '</button>';
-                            } else {
-                                var plantas = response.plantas;
-                                var namesHTML = '';
-                                plantas.forEach(function (planta) {
-                                    namesHTML += '<button type="button" class="list-group-item list-group-item-action btn btn-outline-primary" onclick="buscarPlanta(\'' + planta.Nombre_cientifico + '\')">' + planta.Nombre_cientifico + '</button><br>';
-                                });
-
-                                plantNamesDiv.innerHTML = namesHTML;
-                            }
-                        } else {
-                            plantNamesDiv.innerHTML = '<button type="button" class="list-group-item list-group-item-action active btn btn-outline-danger">Error al cargar las plantas</button>';
-                        }
-                    };
-                    xhr.onerror = function () {
-                        plantNamesDiv.innerHTML = '<button type="button" class="list-group-item list-group-item-action active btn btn-outline-danger">Error: Connection error</button>';
-                    };
-                    xhr.send();
-                }
-            }
+            } 
         }
 
 
@@ -407,9 +380,7 @@ function seleccionarTodosDepartamentos() {
             var plantNamesDiv = document.getElementById("plant-names");
             var selectedState = document.getElementById("estado-seleccionado").innerText;
 
-            // Verificar si se ha seleccionado un estado
             if (!selectedState || selectedState.trim() === "") {
-                // Si no se ha seleccionado ningún estado, mostrar todas las plantas
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', '/mostrar_nombres_plantas/', true);
                 xhr.onload = function () {
@@ -439,7 +410,6 @@ function seleccionarTodosDepartamentos() {
                 };
                 xhr.send();
             } else {
-                // Si se ha seleccionado un estado, llamar directamente a la función mostrarPlantasPorEstado
                 mostrarPlantasPorEstado(selectedState);
             }
         }
@@ -448,6 +418,7 @@ function seleccionarTodosDepartamentos() {
             var plantNamesDiv = document.getElementById("plant-names");
 
             var xhr = new XMLHttpRequest();
+            console.log(selectedState)
             xhr.open('GET', '/mostrar_plantas_por_estado/?nombre_estado=' + encodeURIComponent(selectedState), true);
             xhr.onload = function () {
                 if (xhr.status == 200) {
@@ -482,11 +453,9 @@ function seleccionarTodosDepartamentos() {
 
 
         function mostrarPlantas(plantas) {
-            // Limpiar la lista de plantas actual
             var plantasContainer = document.getElementById('plant-names');
             plantasContainer.innerHTML = '';
 
-            // Mostrar las plantas en la lista
             plantas.forEach(function (planta) {
                 var plantNameBtn = document.createElement('button');
                 plantNameBtn.classList.add('list-group-item', 'list-group-item-action', 'btn', 'btn-outline-primary');
@@ -499,9 +468,7 @@ function seleccionarTodosDepartamentos() {
         }
 
         function mostrarInformacionPlanta(nombreCientifico) {
-            // Llamar a la función para obtener el departamento
             obtenerDepartamento(nombreCientifico);
-            // Aquí puedes agregar cualquier otra funcionalidad que necesites al hacer clic en el botón de planta
         }
         var nombresToIDs = {
             "Cordoba": "COL1316",
@@ -539,20 +506,16 @@ function seleccionarTodosDepartamentos() {
             "Atlantico": "COL1412"
         };
         function obtenerDepartamento(nombrePlanta) {
-            // Realiza una solicitud para obtener el departamento de la planta
             var xhr = new XMLHttpRequest();
             xhr.open('GET', '/obtener_departamento/?nombre_cientifico=' + encodeURIComponent(nombrePlanta), true);
             xhr.onload = function () {
                 if (xhr.status == 200) {
                     var response = JSON.parse(xhr.responseText);
                     if (response.departamento) {
-                        // Si se encuentra el departamento, lo convierte al ID correspondiente
                         var departamentoID = nombresToIDs[response.departamento];
                         if (departamentoID) {
-                            // Dispara un evento personalizado 'mapZoomed' con el ID del departamento
                             document.dispatchEvent(new CustomEvent('mapZoomed', { detail: departamentoID }));
 
-                            // Llama a la función zoomEstado con el ID del departamento como argumento
                             zoomEstado(departamentoID);
                         } else {
                             console.log('No se encontró el ID para el departamento:', response.departamento);
