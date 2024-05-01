@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Plantas</title>
+</head>
+<body>
+    <h1>Lista de Plantas</h1>
+    <ul>
+        {% for planta in plantas %}
+        <li>{{ planta.Nombre_cientifico }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

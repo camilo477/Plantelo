@@ -1,0 +1,382 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Plantelo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/mapdata.js' %}"></script>
+    <script src="{% static 'js/countrymap.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #map {
+            position: relative;
+            width: 80%;
+            height: 80vh;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .ventana {
+            position: absolute;
+            left: -700px; 
+            top: 0;
+            width: 570px;
+            height: 125%;
+            background-color: #BEFFA0;
+            padding: 30px;
+            box-sizing: border-box;
+            transition: left 0.3s; 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        .ventana-abierto {
+            left: 0; 
+        }
+
+        .titulo {
+            color: #4caf50;
+            font-size: 24px;
+            font-weight: bold;
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 10px 0;
+        }
+
+        .busqueda {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .busqueda input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .busqueda button {
+            padding: 10px;
+            border-radius: 4px;
+            border: none;
+            background-color: #4caf50;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .tarjeta {
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .tarjeta img {
+            width: 100%;
+            height: auto;
+        }
+
+        .tarjeta-contenido {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .tarjeta-contenido h3 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+
+        .tarjeta-contenido p {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+
+       
+        
+        .plant-names-container {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .plant-name {
+            margin-bottom: 5px;
+            padding: 5px 10px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+            display: inline-block;
+        }
+        .state-box {
+    position: absolute;
+    top: 80px; 
+    right: 20px;
+    z-index: 1; 
+}
+
+.derecha {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 2; 
+}
+
+.state-container {
+        max-height: 300px; 
+        overflow-y: auto; 
+    }
+
+    .btn-state {
+        margin-bottom: 5px;
+        font-size: 14px;
+        border-radius: 4px;
+        background-color: #4caf50;
+        color: #fff;
+        border: none;
+        padding: 8px 12px; 
+        cursor: pointer; 
+        transition: background-color 0.3s ease; 
+        width: 100%; 
+        display: block; 
+        text-align: left;
+    }
+
+    .btn-state:hover {
+        background-color: #45a049;
+    }
+
+    .btn-state:focus {
+        outline: none; 
+    }
+
+
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+<div class="ventana" id="miVentana">
+    <h1 class="titulo">Plantelo</h1>
+    <div class="busqueda">
+        <input type="text" placeholder="Buscar..." id="search-input">
+        <button onclick="buscarPlanta()">Buscar</button>
+    </div>
+    <div id="plant-info"></div>
+    <div id="no-plant-message" style="display: none;">No se encontraron plantas</div>
+    <div class="container mt-3">
+        <h2>Lista de Nombres de Plantas</h2>
+        <div id="plant-names" class="list-group" style="max-height: 300px; overflow-y: auto;">
+            {% for plant_name in plant_names %}
+                <button type="button" class="list-group-item list-group-item-action plant-button" onclick="mostrarInformacion('{{ plant_name }}')">{{ plant_name }}</button>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="derecha" id="derecha" style="top: 20px;">
+    <button class="boton-plegar-desplegar btn btn-success" onclick="toggleVentana()">
+        Plegar/Desplegar
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8.354 4.354a.5.5 0 0 1 .708 0l5 5a.5.5 0 0 1-.708.708L8 5.707l-5 5a.5.5 0 1 1-.708-.708l5-5a.5.5 0 0 1 0-.708z"/>
+            <path fill-rule="evenodd" d="M8 11.5a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 1 0v9a.5.5 0 0 1-.5.5z"/>
+        </svg>
+    </button>
+    <div class="container state-container mt-3" style="max-height: 300px; overflow-y: auto;">
+        <div id="state-list" class="row">
+            <div class="col-md-12">
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1283')">Amazonas</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1314')">Antioquia</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1402')">Tolima</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1315')">Boyacá</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1412')">Atlántico</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1413')">Bolívar</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1316')">Córdoba</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1317')">Santander</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1414')">Cesar</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1403')">Caquetá</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1398')">Cundinamarca</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1318')">La Guajira</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1400')">Quindío</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1405')">Huila</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1415')">Chocó</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1416')">Magdalena</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1401')">Risaralda</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1399')">Bogotá</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1422')">Casanare</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1420')">Arauca</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1421')">Norte de Santander</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1408')">Valle del Cauca</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1423')">Guaviare</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1424')">Guainía</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1425')">Meta</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1426')">Vaupés</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1427')">Vichada</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1406')">Nariño</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1407')">Putumayo</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1404')">Cauca</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1342')">San Andrés y Providencia</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1397')">Caldas</button>
+                <button class="btn btn-sm btn-state" onclick="zoomEstado('COL1417')">Sucre</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+
+function zoomEstado(state_id) {
+    if (typeof simplemaps_countrymap !== "undefined" && simplemaps_countrymap.state_zoom) {
+        simplemaps_countrymap.state_zoom(state_id);
+    } else {
+        console.error('El objeto simplemaps_countrymap o su método state_zoom no están definidos');
+    }
+}
+
+        function toggleVentana() {
+            var ventana = document.getElementById("miVentana");
+            ventana.classList.toggle("ventana-abierto");
+        }
+    
+        function buscarPlanta(nombre_cientifico) {
+    var plantInfoDiv = document.getElementById("plant-info");
+            
+    if (nombre_cientifico === undefined) {
+        nombre_cientifico = document.getElementById("search-input").value;
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/mostrar_plantas/?nombre_cientifico=' + encodeURIComponent(nombre_cientifico), true);
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            try {
+                var response = JSON.parse(xhr.responseText);
+                if (response.error) {
+                    plantInfoDiv.innerText = 'Error: ' + response.error;
+                } else {
+                    var planta = response.planta;
+                    var cardHTML = '<div class="tarjeta">';
+                    cardHTML += '<div class="tarjeta-contenido">';
+                    cardHTML += '<h3>' + planta.Nombre_cientifico + '</h3>';
+                    cardHTML += '<p><strong>Id:</strong> ' + planta.Id + '</p>';
+                    cardHTML += '<p><strong>Filo:</strong> ' + planta.Filo + '</p>';
+                    cardHTML += '<p><strong>Clase:</strong> ' + planta.Clase + '</p>';
+                    cardHTML += '<p><strong>Orden:</strong> ' + planta.Orden + '</p>';
+                    cardHTML += '<p><strong>Familia:</strong> ' + planta.Familia + '</p>';
+                    cardHTML += '<p><strong>Género:</strong> ' + planta.Genero + '</p>';
+                    cardHTML += '<p><strong>Nombre científico:</strong> ' + planta.Nombre_cientifico + '</p>';
+                    cardHTML += '<p><strong>Localidad:</strong> ' + planta.Localidad + '</p>';
+                    cardHTML += '<p><strong>Provincia/Estado:</strong> ' + planta.Provincia_estado + '</p>';
+                    cardHTML += '<p><strong>Latitud:</strong> ' + planta.Latitud + '</p>';
+                    cardHTML += '<p><strong>Longitud:</strong> ' + planta.Longitud + '</p>';
+                    cardHTML += '<p><strong>Código institución:</strong> ' + planta.Codigo_institucion + '</p>';
+                    cardHTML += '</div></div>';
+
+                    plantInfoDiv.innerHTML = cardHTML;
+                }
+            } catch (error) {
+                plantInfoDiv.innerText = 'Error: Invalid server response';
+            }
+        } else {
+            plantInfoDiv.innerText = 'Error: ' + xhr.statusText;
+        }
+    };
+    xhr.onerror = function() {
+        plantInfoDiv.innerText = 'Connection error';
+    };
+    xhr.send();
+}
+
+function mostrarNombresPlantas() {
+    var plantNamesDiv = document.getElementById("plant-names");
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/mostrar_nombres_plantas/', true);
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            try {
+                var response = JSON.parse(xhr.responseText);
+                if (response.error) {
+                    plantNamesDiv.innerHTML = '<button type="button" class="list-group-item list-group-item-action active">' + response.error + '</button>';
+                } else {
+                    var plantNames = response.plant_names;
+                    var namesHTML = '';
+                    plantNames.forEach(function(name) {
+                        namesHTML += '<button type="button" class="list-group-item list-group-item-action btn btn-outline-primary" onclick="buscarPlanta(\'' + name + '\')">' + name + '</button><br>';
+                    });
+
+                    plantNamesDiv.innerHTML = namesHTML;
+                }
+            } catch (error) {
+                plantNamesDiv.innerHTML = '<button type="button" class="list-group-item list-group-item-action active btn btn-outline-danger">Error: Invalid server response</button>';
+            }
+        } else {
+            plantNamesDiv.innerHTML = '<button type="button" class="list-group-item list-group-item-action active btn btn-outline-danger">Error: ' + xhr.statusText + '</button>';
+        }
+    };
+    xhr.onerror = function() {
+        plantNamesDiv.innerHTML = '<button type="button" class="list-group-item list-group-item-action active btn btn-outline-danger">Connection error</button>';
+    };
+    xhr.send();
+}
+
+function autocompletarPlantas(input) {
+    var plantNamesDiv = document.getElementById("plant-names");
+
+    var searchTerm = input.value.toLowerCase();
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/buscar_plantas/?nombre_cientifico=' + encodeURIComponent(searchTerm), true);
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            try {
+                var response = JSON.parse(xhr.responseText);
+                if (response.error) {
+                    plantNamesDiv.innerHTML = '<button type="button" class="list-group-item list-group-item-action active">' + response.error + '</button>';
+                } else {
+                    var plantNames = response.plant_names;
+                    var namesHTML = '';
+                    plantNames.forEach(function(name) {
+                        namesHTML += '<button type="button" class="list-group-item list-group-item-action btn btn-outline-primary" onclick="buscarPlanta(\'' + name + '\')">' + name + '</button><br>';
+                    });
+
+                    plantNamesDiv.innerHTML = namesHTML;
+                }
+            } catch (error) {
+                plantNamesDiv.innerHTML = '<button type="button" class="list-group-item list-group-item-action active btn btn-outline-danger">Error: Invalid server response</button>';
+            }
+        } else {
+            plantNamesDiv.innerHTML = '<button type="button" class="list-group-item list-group-item-action active btn btn-outline-danger">Error: ' + xhr.statusText + '</button>';
+        }
+    };
+    xhr.onerror = function() {
+        plantNamesDiv.innerHTML = '<button type="button" class="list-group-item list-group-item-action active btn btn-outline-danger">Connection error</button>';
+    };
+    xhr.send();
+}
+
+document.getElementById('search-input').addEventListener('input', function() {
+    autocompletarPlantas(this);
+});
+
+
+window.onload = function() {
+    mostrarNombresPlantas();
+};
+
+
+    </script>
+
+</body>
+</html>
