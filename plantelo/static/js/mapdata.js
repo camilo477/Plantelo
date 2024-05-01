@@ -148,6 +148,7 @@ var simplemaps_countrymap_mapdata={
     },
     regions: {},
   };
+  
   document.addEventListener('DOMContentLoaded', function() {
     // Define la configuración del mapa
     var simplemaps_countrymap_mapdata = {
@@ -159,7 +160,7 @@ var simplemaps_countrymap_mapdata={
         // Obtiene el nivel de zoom actual
         var zoomLevel = simplemaps_countrymap.zoom_level;
         var zoomArea;
-  
+        
         // Determina qué parte del mapa se está zoomando según el nivel de zoom
         switch (zoomLevel) {
             case 'out':
@@ -176,6 +177,10 @@ var simplemaps_countrymap_mapdata={
 
                 // Buscamos el nombre del estado en el objeto stateNamesById
                 var zoomedStateName = stateNamesById[zoomedStateId] || 'Desconocido';
+
+                var zoomEvent = new CustomEvent('mapZoomed', { detail: zoomedStateName });
+                document.dispatchEvent(zoomEvent);
+
                 console.log('Se ha completado la acción de zoom en:', zoomArea, 'Nombre del estado:', zoomedStateName);
                 break;
             case 'manual':

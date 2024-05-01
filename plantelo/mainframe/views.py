@@ -127,3 +127,77 @@ def test_ajax_url(request):
 
 def mapa(request):
     return render(request, 'pages/index.html')
+
+def mostrar_plantas_por_estado(request):
+    nombre_estado = request.GET.get('nombre_estado', '').lower()
+
+    try:
+        connection = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="",
+            database="plantas"
+        )
+
+        cursor = connection.cursor()
+
+        if nombre_estado:  # Si se especifica un estado, filtrar por ese estado
+            query = "SELECT * FROM planta WHERE Provincia_estado = %s;"
+            cursor.execute(query, (nombre_estado,))
+        else:  # Si no se especifica un estado, devolver un error
+            return JsonResponse({'error': 'Debe especificar un estado'})
+
+        plantas = cursor.fetchall()
+
+        if not plantas:
+            return JsonResponse({'error': 'No se encontraron plantas para el estado "{}"'.format(nombre_estado)})
+
+        plantas_info = []
+        for planta in plantas:
+            planta_info = {
+                'Id': planta[0],
+                'Filo': planta[1],
+                'Clase': planta[2],
+                'Orden': planta[3],
+                'Familia': planta[4],
+                'Genero': planta[5],
+                'Nombre_cientifico': planta[6],
+                'Localidad': planta[7],
+                'Provincia_estado': planta[8],
+                'Latitud': float(planta[9]),
+                'Longitud': float(planta[10]),
+                'Codigo_institucion': planta[11],
+            }
+            plantas_info.append(planta_info)
+
+        return JsonResponse({'plantas': plantas_info})
+    except Exception as e:
+        return JsonResponse({'error': str(e)})
+    finally:
+        if cursor:
+            cursor.fetchall()  
+            cursor.close()
+        if connection:
+            connection.close()
+
+
+def obtener_departamento(request):
+    if request.method == 'GET':
+        nombre_cientifico = request.GET.get('nombre_cientifico', None)
+        if nombre_cientifico:
+            try:
+                with connection.cursor() as cursor:
+                    query = "SELECT Provincia_estado FROM planta WHERE Nombre_cientifico = %s;"
+                    cursor.execute(query, [nombre_cientifico])
+                    departamento = cursor.fetchone()
+
+                if departamento:
+                    return JsonResponse({'departamento': departamento[0]})
+                else:
+                    return JsonResponse({'error': 'Departamento no encontrado para la planta'}, status=404)
+            except Exception as e:
+                return JsonResponse({'error': str(e)}, status=500)
+        else:
+            return JsonResponse({'error': 'Parámetro nombre_cientifico no proporcionado'}, status=400)
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
