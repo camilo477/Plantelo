@@ -90,26 +90,18 @@ def mostrar_plantas(request):
 
         planta_info = {
             'Id': planta[0],
-            'Codigo_institucion': planta[1],
-            'Codigo_coleccion': planta[2],
-            'Grabado_por': planta[3],
-            'Pais': planta[4],
-            'Provincia_estado': planta[5],
-            'Ciudad': planta[6],
+            'Filo': planta[1],
+            'Clase': planta[2],
+            'Orden': planta[3],
+            'Familia': planta[4],
+            'Genero': planta[5],
+            'Nombre_cientifico': planta[6],
             'Localidad': planta[7],
-            'Latitud': float(planta[8]),
-            'Longitud': float(planta[9]),
-            'Identificado_por': planta[10],
-            'Nombre_cientifico': planta[11],
-            'Reino': planta[12],
-            'Filo': planta[13],
-            'Clase': planta[14],
-            'Orden': planta[15],
-            'Familia': planta[16],
-            'Genero': planta[17],
-            'Epiteto_especifico': planta[18],
-            'Taxon_rango': planta[19],
-            'Ubicacion': planta[20]
+            'Provincia_estado': planta[8],
+            'Latitud': float(planta[9]),
+            'Longitud': float(planta[10]),
+            'Codigo_institucion': planta[11],
+            
         }
 
         return JsonResponse({'planta': planta_info})
