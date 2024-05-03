@@ -5845,8 +5845,14 @@
     position: relative;
     width: 100%;
     overflow: hidden;
+    background-color: transparent !important;
   }
   
+  /* Quitar la superposición oscura del carrusel de Bootstrap */
+.carousel-item::before {
+  background-color: transparent !important; /* Eliminar el fondo oscuro */
+}
+
   .carousel-inner::after {
     display: block;
     clear: both;
@@ -5861,6 +5867,7 @@
     margin-right: -100%;
     backface-visibility: hidden;
     transition: transform 0.6s ease-in-out;
+    background-color: transparent;
   }
   
   @media (prefers-reduced-motion: reduce) {
@@ -6017,7 +6024,7 @@
     z-index: 10;
     padding-top: 20px;
     padding-bottom: 20px;
-    color: #fff;
+    color: #F3F6FF;
     text-align: center;
   }
   
