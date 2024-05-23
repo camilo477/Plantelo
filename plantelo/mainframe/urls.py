@@ -16,4 +16,5 @@ urlpatterns = [
     path('reclamo/', complaint_view, name='complaint'),
     path('formulario/', complaint_view, name='complaint'),
     path('success/', success_view, name='success'),
+    path('buscar_plantas_por_letras/', views.buscar_plantas_por_letras, name='buscar_plantas_por_letras'),
 ]

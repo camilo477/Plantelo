@@ -21,6 +21,16 @@ from django.urls import reverse
 from django.core.mail import send_mail
 from .forms import ComplaintForm
 
+def buscar_plantas_por_letras(request):
+    if request.method == 'GET':
+        letras = request.GET.get('letras', '')
+        # Realiza la búsqueda de las plantas que coincidan con las letras ingresadas
+        plantas = Planta.objects.filter(Nombre_cientifico__contains=letras).values_list('Nombre_cientifico', flat=True)
+
+        return JsonResponse({'plant_names': list(plantas)})
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+
 def complaint_view(request):
     if request.method == 'POST':
         nombre = request.POST.get('name')

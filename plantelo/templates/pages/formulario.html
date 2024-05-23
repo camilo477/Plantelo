@@ -9,7 +9,7 @@
     <!-- Estilos personalizados -->
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #28a745; /* Cambiado a verde */
             font-family: Arial, sans-serif;
             color: #343a40;
             margin: 0;
@@ -27,7 +27,7 @@
         h1 {
             text-align: center;
             margin-bottom: 30px;
-            color: #007bff;
+            color: #28a745; /* Cambiado a verde */
         }
         .form-group {
             margin-bottom: 20px;
@@ -55,14 +55,23 @@
             padding: 10px;
             border: none;
             border-radius: 5px;
-            background-color: #007bff;
+            background-color: #28a745; /* Cambiado a verde */
             color: #fff;
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s;
         }
         button[type="submit"]:hover {
-            background-color: #0056b3;
+            background-color: #218838; /* Cambiado a verde más oscuro */
+        }
+        .btn-home {
+            margin-top: 20px;
+            background-color: #28a745; /* Cambiado a verde */
+            border-color: #28a745; /* Cambiado a verde */
+        }
+        .btn-home:hover {
+            background-color: #218838; /* Cambiado a verde más oscuro */
+            border-color: #1e7e34; /* Cambiado a verde más oscuro */
         }
     </style>
 </head>
@@ -93,6 +102,7 @@
                 </div>
             </div>
             <button type="submit" class="btn btn-primary">Enviar</button>
+            <a href="/home" class="btn btn-secondary btn-home">Ir a Inicio</a>
         </form>
     </div>
 

@@ -183,13 +183,12 @@
     <div class="ventana" id="miVentana">
         <h1 class="titulo">Plantelo</h1>
         <div class="busqueda">
-            <input type="text" placeholder="Buscar..." id="search-input">
+            <input type="text" placeholder="Buscar..." id="search-input" oninput="buscarPorLetras()">
             <button onclick="buscarPlanta()">Buscar</button>
             <div id="estado-seleccionado"></div>
-            <button class="btn btn-secondary" onclick="seleccionarTodosDepartamentos()">Mostrar todas las
-                plantas</button>
-
+            <button class="btn btn-secondary" onclick="seleccionarTodosDepartamentos()">Mostrar todas las plantas</button>
         </div>
+        
         <div id="loader" style="display: none;">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Cargando...</span>
@@ -266,6 +265,29 @@
         </div>
     </div>
     <script>
+
+
+function buscarPorLetras() {
+    var searchInput = document.getElementById("search-input").value.toLowerCase(); // Convertir a minúsculas
+    var plantNamesDiv = document.getElementById("plant-names");
+
+    if (searchInput.length >= 1) { // Verificar si hay al menos una letra escrita
+        var filteredPlants = plant_names.filter(function(plant_name) {
+            return plant_name.toLowerCase().startsWith(searchInput); // Verificar si el nombre de la planta comienza con las letras escritas
+        });
+
+        // Construir el HTML para mostrar los nombres de las plantas filtradas
+        var namesHTML = '';
+        filteredPlants.forEach(function (name) {
+            namesHTML += '<button type="button" class="list-group-item list-group-item-action btn btn-outline-primary" onclick="obtenerDepartamentoYBuscarPlanta(\'' + name + '\')">' + name + '</button><br>';
+        });
+
+        plantNamesDiv.innerHTML = namesHTML;
+    } else {
+        // Si no se ha ingresado nada en la búsqueda, mostrar todas las plantas
+        mostrarNombresPlantas();
+    }
+}
 
         function seleccionarTodosDepartamentos() {
             mostrarNombresPlantas()
