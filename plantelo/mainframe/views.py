@@ -9,11 +9,45 @@ from django.http import JsonResponse
 from .models import Planta
 from django.shortcuts import render
 from .models import Planta
-
+from .forms import ComplaintForm
 from django.shortcuts import render
 import mysql.connector
 from django.http import JsonResponse
 from .models import Planta
+from django.core.mail import send_mail
+from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.core.mail import send_mail
+from .forms import ComplaintForm
+
+def complaint_view(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('name')
+        correo = request.POST.get('email')
+        mensaje = request.POST.get('message')
+
+        body = f"Nombre: {nombre}\nCorreo Electrónico: {correo}\nMensaje: {mensaje}"
+
+        send_mail(
+            'Asunto del correo',
+            body,
+            'camiska.477@gmail.com', 
+            ['camiska.477@gmail.com'], 
+            fail_silently=False,
+        )
+
+        return HttpResponseRedirect(reverse('success'))
+    return render(request, 'pages/formulario.html')
+
+
+
+def success_view(request):
+    return render(request, 'pages/success.html')
+
+
+def success_view(request):
+    return render(request, 'pages/success.html')
 
 def buscar_plantas(request):
     
@@ -125,6 +159,10 @@ def test_ajax_url(request):
         return JsonResponse({'error': 'Planta con ID 3 no encontrada'})
 
 
+def formulario(request):
+  
+  context = {} 
+  return render(request, 'pages/formulario.html', context)
 
 def mapa(request):
     return render(request, 'pages/index.html')
