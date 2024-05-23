@@ -190,6 +190,13 @@
                 plantas</button>
 
         </div>
+        <div id="loader" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p>Cargando...</p>
+        </div>
+        <div id="plant-info"></div>
         <div id="plant-info"></div>
         <div id="no-plant-message" style="display: none;">No se encontraron plantas</div>
         <div class="container mt-3">
@@ -329,52 +336,67 @@
         }
 
         function buscarPlanta(nombre_cientifico) {
-            var plantInfoDiv = document.getElementById("plant-info");
+    var plantInfoDiv = document.getElementById("plant-info");
+    var loaderDiv = document.getElementById("loader");
 
-            if (nombre_cientifico === undefined) {
-                nombre_cientifico = document.getElementById("search-input").value;
-            }
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', '/mostrar_plantas/?nombre_cientifico=' + encodeURIComponent(nombre_cientifico), true);
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    try {
-                        var response = JSON.parse(xhr.responseText);
-                        if (response.error) {
-                            plantInfoDiv.innerText = 'Error: ' + response.error;
-                        } else {
-                            var planta = response.planta;
-                            var cardHTML = '<div class="tarjeta">';
-                            cardHTML += '<div class="tarjeta-contenido">';
-                            cardHTML += '<h3>' + planta.Nombre_cientifico + '</h3>';
-                            cardHTML += '<p><strong>Id:</strong> ' + planta.Id + '</p>';
-                            cardHTML += '<p><strong>Filo:</strong> ' + planta.Filo + '</p>';
-                            cardHTML += '<p><strong>Clase:</strong> ' + planta.Clase + '</p>';
-                            cardHTML += '<p><strong>Orden:</strong> ' + planta.Orden + '</p>';
-                            cardHTML += '<p><strong>Familia:</strong> ' + planta.Familia + '</p>';
-                            cardHTML += '<p><strong>Género:</strong> ' + planta.Genero + '</p>';
-                            cardHTML += '<p><strong>Nombre científico:</strong> ' + planta.Nombre_cientifico + '</p>';
-                            cardHTML += '<p><strong>Localidad:</strong> ' + planta.Localidad + '</p>';
-                            cardHTML += '<p><strong>Provincia/Estado:</strong> ' + planta.Provincia_estado + '</p>';
-                            cardHTML += '<p><strong>Latitud:</strong> ' + planta.Latitud + '</p>';
-                            cardHTML += '<p><strong>Longitud:</strong> ' + planta.Longitud + '</p>';
-                            cardHTML += '<p><strong>Código institución:</strong> ' + planta.Codigo_institucion + '</p>';
-                            cardHTML += '</div></div>';
+    // Mostrar el spinner de carga
+    loaderDiv.style.display = "block";
 
-                            plantInfoDiv.innerHTML = cardHTML;
-                        }
-                    } catch (error) {
-                        plantInfoDiv.innerText = 'Error: Invalid server response';
-                    }
+    if (nombre_cientifico === undefined) {
+        nombre_cientifico = document.getElementById("search-input").value;
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/mostrar_plantas/?nombre_cientifico=' + encodeURIComponent(nombre_cientifico), true);
+    xhr.onload = function () {
+        
+        setTimeout(function() {
+            loaderDiv.style.display = "none";
+        }, 800);
+
+        if (xhr.status === 200) {
+            try {
+                var response = JSON.parse(xhr.responseText);
+                if (response.error) {
+                    plantInfoDiv.innerText = 'Error: ' + response.error;
                 } else {
-                    plantInfoDiv.innerText = 'Error: ' + xhr.statusText;
+                    var planta = response.planta;
+                    var cardHTML = '<div class="tarjeta">';
+                    cardHTML += '<div class="tarjeta-contenido">';
+                    cardHTML += '<h3>' + planta.Nombre_cientifico + '</h3>';
+                    cardHTML += '<p><strong>Id:</strong> ' + planta.Id + '</p>';
+                    cardHTML += '<p><strong>Filo:</strong> ' + planta.Filo + '</p>';
+                    cardHTML += '<p><strong>Clase:</strong> ' + planta.Clase + '</p>';
+                    cardHTML += '<p><strong>Orden:</strong> ' + planta.Orden + '</p>';
+                    cardHTML += '<p><strong>Familia:</strong> ' + planta.Familia + '</p>';
+                    cardHTML += '<p><strong>Género:</strong> ' + planta.Genero + '</p>';
+                    cardHTML += '<p><strong>Nombre científico:</strong> ' + planta.Nombre_cientifico + '</p>';
+                    cardHTML += '<p><strong>Localidad:</strong> ' + planta.Localidad + '</p>';
+                    cardHTML += '<p><strong>Provincia/Estado:</strong> ' + planta.Provincia_estado + '</p>';
+                    cardHTML += '<p><strong>Latitud:</strong> ' + planta.Latitud + '</p>';
+                    cardHTML += '<p><strong>Longitud:</strong> ' + planta.Longitud + '</p>';
+                    cardHTML += '<p><strong>Código institución:</strong> ' + planta.Codigo_institucion + '</p>';
+                    cardHTML += '</div></div>';
+
+                    plantInfoDiv.innerHTML = cardHTML;
                 }
-            };
-            xhr.onerror = function () {
-                plantInfoDiv.innerText = 'Connection error';
-            };
-            xhr.send();
+            } catch (error) {
+                plantInfoDiv.innerText = 'Error: Invalid server response';
+            }
+        } else {
+            plantInfoDiv.innerText = 'Error: ' + xhr.statusText;
         }
+    };
+    xhr.onerror = function () {
+        // Ocultar el spinner de carga en caso de error después de 2 segundos (2000 milisegundos)
+        setTimeout(function() {
+            loaderDiv.style.display = "none";
+        }, 2000);
+        plantInfoDiv.innerText = 'Connection error';
+    };
+    xhr.send();
+}
+
+
 
         function mostrarNombresPlantas() {
             var plantNamesDiv = document.getElementById("plant-names");

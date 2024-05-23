@@ -150,11 +150,21 @@ var simplemaps_countrymap_mapdata={
   };
   
   document.addEventListener('DOMContentLoaded', function() {
+    var ventanaAbierta = false;
     // Define la configuración del mapa
     var simplemaps_countrymap_mapdata = {
         // Aquí va tu configuración del mapa
     };
-  
+    function toggleVentana() {
+        var ventana = document.getElementById("miVentana");
+        // Verifica si la ventana ya está abierta
+        if (!ventanaAbierta) {
+            // Si no está abierta, abre la ventana
+            ventana.classList.add("ventana-abierto");
+            // Actualiza el estado para indicar que la ventana está abierta
+            ventanaAbierta = true;
+        }
+    }
     // Agrega un listener para manejar el evento después de completarse el zoom en el mapa
     simplemaps_countrymap.hooks.zooming_complete = function() {
         // Obtiene el nivel de zoom actual
@@ -180,8 +190,14 @@ var simplemaps_countrymap_mapdata={
 
                 var zoomEvent = new CustomEvent('mapZoomed', { detail: zoomedStateName });
                 document.dispatchEvent(zoomEvent);
-
-                console.log('Se ha completado la acción de zoom en:', zoomArea, 'Nombre del estado:', zoomedStateName);
+                
+                
+                console.log('Se ha completado la acción de zooma en:', zoomArea, 'Nombre del estado:', zoomedStateName);
+                if (!ventanaAbierta) {
+                    toggleVentana();
+                    // Actualiza el estado para indicar que la ventana está abierta
+                    ventanaAbierta = true;
+                }
                 break;
             case 'manual':
                 zoomArea = 'Zoom manual';
@@ -189,7 +205,7 @@ var simplemaps_countrymap_mapdata={
             default:
                 zoomArea = 'Desconocido';
         }
-  
+        
         // Imprimir en la consola la acción de zoom
         console.log('Se ha completado la acción de zoom en:', zoomArea);
         // Puedes agregar aquí cualquier acción que desees realizar después de que se complete el zoom en el mapa

@@ -16,6 +16,7 @@ from django.http import JsonResponse
 from .models import Planta
 
 def buscar_plantas(request):
+    
     nombre_cientifico = request.GET.get('nombre_cientifico', '').lower() 
 
     try:
@@ -147,9 +148,6 @@ def mostrar_plantas_por_estado(request):
             cursor.execute(query, (nombre_estado,))
 
         plantas = cursor.fetchall()
-
-        if not plantas:
-            return JsonResponse({'error': 'No se encontraron plantas para el estado "{}"'.format(nombre_estado)})
 
         plantas_info = []
         for planta in plantas:
